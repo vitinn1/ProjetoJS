@@ -10,6 +10,8 @@ const canvas = document.getElementById("gameCanvas");
     function startGame(level) {
       document.getElementById("menu").style.display = "none";
       canvas.style.display = "block";
+      canvas.style.margin = "0 auto"
+
 
       gravity = 0.5;
       keys = {};
@@ -30,6 +32,7 @@ const canvas = document.getElementById("gameCanvas");
           { x: 0, y: 370, width: 800, height: 30 },
           { x: 200, y: 300, width: 100, height: 20 },
           { x: 400, y: 250, width: 100, height: 20 },
+          { x: 550, y: 125, width: 100, height: 20 },
         ];
       } else if (level === 2) {
         platforms = [
