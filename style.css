@@ -1,7 +1,7 @@
-    body {
+body {
       margin: 0;
       font-family: sans-serif;
-      background: #111;
+      background: black;
       color: #fff;
       text-align: center;
     }
@@ -20,4 +20,11 @@
       background: #333;
       margin: 0 auto;
       border: 2px solid #fff;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0 auto;
     }
