@@ -119,14 +119,22 @@ const canvas = document.getElementById("gameCanvas");
       }
       requestAnimationFrame(update);
     }
-    function showVictoryMessage() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "white";
-      ctx.font = "36px sans-serif";
-      ctx.fillText("Você completou a fase!", 200, 200);
+function showVictoryMessage() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "white";
+  ctx.font = "36px sans-serif";
 
-      setTimeout(() => {
-        canvas.style.display = "none";
-        document.getElementById("menu").style.display = "block";
-      }, 2000);
-    }
+  const message = "Você completou a fase!";
+  const textWidth = ctx.measureText(message).width;
+
+  // Centraliza horizontal e verticalmente
+  const x = (canvas.width - textWidth) / 2;
+  const y = canvas.height / 2;
+
+  ctx.fillText(message, x, y);
+
+  setTimeout(() => {
+    canvas.style.display = "none";
+    document.getElementById("menu").style.display = "block";
+  }, 2000);
+}
