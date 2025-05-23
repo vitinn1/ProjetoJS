@@ -1,5 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const platformImage = new Image();
+platformImage.src = "plataforma.png";
 
 let player, gravity, keys, platforms, objective, currentLevel, movingPlatforms = [];
 const sprite = new Image();
@@ -213,8 +215,12 @@ function drawGame() {
   ctx.restore();
 
   for (let plat of platforms) {
+      if (platformImage.complete) {
+    ctx.drawImage(platformImage, plat.x, plat.y, plat.width, plat.height);
+  } else {
     ctx.fillStyle = plat.moving ? "gray" : "#fff";
     ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+  }
   }
 
   ctx.fillStyle = objective.color;
