@@ -1,30 +1,67 @@
 body {
-      margin: 0;
-      font-family: sans-serif;
-      background: black;
-      color: #fff;
-      text-align: center;
-    }
+  margin: 0;
+  font-family: sans-serif;
+  background: black;
+  color: #fff;
+  text-align: center;
+}
 
-    #menu {
-      padding: 20px;
-    }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    #gameCanvas {
-      display: none;
-      background: #333;
-      margin: 0 auto;
-      border: 2px solid #fff;
-    }
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0 auto;
-    }
+#menu {
+  padding: 20px;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#gameCanvas {
+  display: none;
+  background-image: url('img/Purple_Nebula.png');
+  /* Caminho da imagem */
+  background-size: cover;
+  /* Cobre toda a tela */
+  background-repeat: no-repeat;
+  /* Não repete a imagem */
+  background-position: center center;
+  /* Centraliza a imagem */
+  margin: 0 auto;
+  border: 2px solid #fff;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0 auto;
+}
+
+.fase-completa {
+  background-color: green;
+  color: white;
+  border: 2px solid white;
+}
+
+#pauseMenu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 40px;
+  border: 2px solid white;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
+  z-index: 10;
+}
+
+#pauseMenu button {
+  display: block;
+  margin: 15px auto;
+  padding: 10px 25px;
+  font-size: 18px;
+}
