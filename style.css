@@ -19,7 +19,7 @@ button {
 
 #gameCanvas {
   display: none;
-  background-image: url('img/Purple_Nebula.png');
+  background-image: url('img/Blue_Nebula.png');
   /* Caminho da imagem */
   background-size: cover;
   /* Cobre toda a tela */
