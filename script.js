@@ -2,6 +2,34 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const platformImage = new Image();
 platformImage.src = "img/plataforma.png";
+const trapCoinImage = new Image();
+trapCoinImage.src = "img/crystal64.png";
+
+const jumpSound = new Audio("audio/jump.mp3");
+const backgroundMusic = new Audio("audio/background.mp3");
+const buttonSound = new Audio("audio/button.mp3")
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.5; 
+
+const menuSound = new Audio("audio/menuSound.mp3")
+menuSound.loop = true;
+backgroundMusic.volume = 0.5; 
+
+window.addEventListener("load", () => {
+  // Evita autoplay bloqueado
+  document.body.addEventListener("click", () => {
+    if (menuSound.paused) {
+      menuSound.play();
+    }
+  }, { once: true });
+
+  // Exibe o menu e inicia som se possível
+  document.getElementById("menu").style.display = "block";
+});
+
+window.addEventListener("click", () => {
+  iniciarMusicaMenu();
+}, { once: true });
 
 let player, gravity, keys, platforms, objective, currentLevel, movingPlatforms = [];
 let timer = 20000;
@@ -9,6 +37,15 @@ let timerActive = false;
 let lastTime = 0;
 let trapCoin;
 let timerInterval;
+
+// trap coin
+let trapCoinFrame = 12;
+let trapCoinFrameDelay = 10;
+let trapCoinFrameCounter = 12;
+const TRAPCOIN_FRAME_WIDTH = 64; // largura de um frame do sprite
+const TRAPCOIN_FRAME_HEIGHT = 64; // altura
+const TRAPCOIN_TOTAL_FRAMES = 12; // ajuste conforme seu sprite sheet
+
 
 // nave 
 const shipSprite = new Image();
@@ -41,12 +78,21 @@ sprites.idle.src = 'img/IdleAstronaut.png';
 sprites.run.src = 'img/RunAstronaut.png';
 sprites.jump.src = 'img/JumpAstronaut.png';
 
+
 const FRAME_WIDTH = 18;
 const FRAME_HEIGHT = 24;
 const TOTAL_FRAMES = 4;
 let currentFrame = 0;
 let frameCounter = 0;
 const FRAME_DELAY = 10;
+
+document.querySelectorAll("button").forEach(button => {
+  button.addEventListener("click", () => {
+    buttonSound.currentTime = 0;
+    buttonSound.play();
+  });
+});
+
 
 document.getElementById("fase1").addEventListener("click", () => startGame(1));
 document.getElementById("fase2").addEventListener("click", () => startGame(2));
@@ -59,6 +105,29 @@ function startGame(level) {
   currentLevel = level;
   document.getElementById("menu").style.display = "none";
   canvas.style.display = "block";
+
+
+menuSound.pause();
+menuSound.currentTime = 0;
+
+backgroundMusic.play().catch(() => {
+  // fallback para garantir reprodução quando possível
+  document.body.addEventListener("click", () => {
+    backgroundMusic.play();
+  }, { once: true });
+});
+
+// Garante que a música de menu pare ao entrar na fase
+if (!menuSound.paused) {
+  menuSound.pause();
+  menuSound.currentTime = 0;
+}
+
+// Toca a música de fundo só se ainda não estiver tocando
+if (backgroundMusic.paused) {
+  backgroundMusic.play().catch(() => {});
+}
+
 
   gravity = 0.3;
   keys = {};
@@ -170,7 +239,18 @@ function startGame(level) {
     timerInterval = null;
   }
 
+  // Troca a música do menu pela de fase
+if (menuSound && !menuSound.paused) {
+  menuSound.pause();
+  menuSound.currentTime = 0;
+}
 
+if (backgroundMusic.paused) {
+    menuSound.pause();
+    menuSound.currentTime = 0;
+
+    backgroundMusic.play().catch(() => {});
+  }
   animationId = requestAnimationFrame(update);
 }
 
@@ -201,6 +281,7 @@ function update() {
   if ((keys["ArrowUp"] || keys["KeyW"]) && !player.jumping) {
     player.dy = -7;
     player.jumping = true;
+    jumpSound.play()
   }
 
   player.dy += gravity;
@@ -359,7 +440,7 @@ function updateLevel3() {
   for (let plat of movingPlatforms) {
     if (plat.horizontal) {
       plat.x += plat.dir * plat.speed;
-      if (plat.x <= 160 || plat.x + plat.width >= 700) plat.dir *= -1;
+      if (plat.x <= 200 || plat.x + plat.width >= 700) plat.dir *= -1;
     } else {
       plat.y += plat.dir * plat.speed;
       if (plat.y <= 160 || plat.y >= 500) plat.dir *= -1;
@@ -689,10 +770,22 @@ function drawGame() {
   }
 
   // Desenhar trapCoin aqui (visível)
-  if (trapCoin) {
-    ctx.fillStyle = trapCoin.color;
-    ctx.fillRect(trapCoin.x, trapCoin.y, trapCoin.width, trapCoin.height);
+if (trapCoin && trapCoinImage.complete) {
+  ctx.drawImage(
+    trapCoinImage,
+    trapCoinFrame * TRAPCOIN_FRAME_WIDTH, 0,
+    TRAPCOIN_FRAME_WIDTH, TRAPCOIN_FRAME_HEIGHT,
+    trapCoin.x, trapCoin.y,
+    trapCoin.width, trapCoin.height
+  );
+
+  // Atualiza frame de animação
+  trapCoinFrameCounter++;
+  if (trapCoinFrameCounter >= trapCoinFrameDelay) {
+    trapCoinFrameCounter = 0;
+    trapCoinFrame = (trapCoinFrame + 1) % TRAPCOIN_TOTAL_FRAMES;
   }
+}
   // Desenhar objetivo
   ctx.drawImage(
     shipSprite,
@@ -748,6 +841,11 @@ function showVictoryMessage() {
     clearInterval(timerInterval);
     timerInterval = null;
   }
+
+backgroundMusic.pause();
+
+menuSound.currentTime = 0; // reinicia do começo
+menuSound.play();
 }
 
 function showGameOver() {
@@ -805,9 +903,25 @@ document.getElementById("btnContinue").addEventListener("click", () => {
   animationId = requestAnimationFrame(update);
 });
 
+// Quando clicar em "Voltar para o Menu"
 document.getElementById("btnBackToMenu").addEventListener("click", () => {
   paused = false;
   document.getElementById("pauseMenu").style.display = "none";
   canvas.style.display = "none";
   document.getElementById("menu").style.display = "block";
+
+  // Música: parar fase e voltar menu
+  backgroundMusic.pause();
+  backgroundMusic.currentTime = 0;
+  if (menuSound.paused) {
+    menuSound.play();
+  }
 });
+
+window.addEventListener("click", () => {
+  if (menuSound.paused) {
+    menuSound.play().catch(() => {});
+  }
+}, { once: true });
+
+
